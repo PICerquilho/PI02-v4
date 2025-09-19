@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AlunoForm
-from .models import Aluno, Nota # <-- AQUI ESTÁ A CORREÇÃO
+from .models import Aluno
 from django.http import JsonResponse
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 import unicodedata
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import NotaForm # <-- Importe NotaForm aqui
+from datetime import date
 
 def remover_acentos(texto):
     nfkd = unicodedata.normalize('NFKD', texto)
@@ -29,13 +29,11 @@ def login_view(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             login(request, user)
             return redirect('index')
         else:
             messages.error(request, 'Usuário ou senha inválidos.')
-
     return render(request, 'login.html')
 
 def logout_view(request):
@@ -115,84 +113,46 @@ def excluir_aluno(request, id_aluno):
         return redirect('index')
     return render(request, 'confirmar_exclusao.html', {'aluno': aluno})
 
-@login_required(login_url='login')
-def editar_notas(request, id_aluno):
-    aluno = get_object_or_404(Aluno, id_aluno=id_aluno)
-    nota, created = Nota.objects.get_or_create(aluno=aluno)
-
-    if request.method == "POST":
-        form = NotaForm(request.POST, instance=nota)
-        if form.is_valid():
-            form.save()
-            return redirect('detalhes_aluno', id_aluno=aluno.id_aluno)
-    else:
-        form = NotaForm(instance=nota)
-
-    return render(request, 'editar_notas.html', {'aluno': aluno, 'form': form})
-
-# AQUI ESTÁ A VIEW DO DASHBOARD ADICIONADA
+# AQUI ESTÁ A VIEW DO DASHBOARD MODIFICADA
 @login_required(login_url='login')
 def dashboard(request):
     total_alunos = Aluno.objects.count()
-    total_notas = Nota.objects.count()
-    percent_otimo = 0
-    percent_bom = 0
-    percent_ruim = 0
-
-    if total_notas > 0:
-        alunos_otimos = Nota.objects.filter(media__gte=8).count()
-        alunos_bons = Nota.objects.filter(media__lt=8, media__gte=5).count()
-        alunos_ruins = Nota.objects.filter(media__lt=5).count()
-        percent_otimo = (alunos_otimos / total_notas) * 100
-        percent_bom = (alunos_bons / total_notas) * 100
-        percent_ruim = (alunos_ruins / total_notas) * 100
-
-    stats_por_serie = {}
-    series_distintas = Aluno.objects.values_list('serie', flat=True).distinct().order_by('serie')
     
-    for serie in series_distintas:
-        alunos_na_serie = Aluno.objects.filter(serie=serie)
-        total_alunos_serie = alunos_na_serie.count()
-        notas_na_serie = Nota.objects.filter(aluno__in=alunos_na_serie)
-        total_notas_serie = notas_na_serie.count()
-
-        if total_notas_serie > 0:
-            alunos_otimos_serie = notas_na_serie.filter(media__gte=8).count()
-            alunos_bons_serie = notas_na_serie.filter(media__lt=8, media__gte=5).count()
-            alunos_ruins_serie = notas_na_serie.filter(media__lt=5).count()
-
-            stats_por_serie[serie] = {
-                'total_alunos': total_alunos_serie,
-                'percent_otimo': (alunos_otimos_serie / total_notas_serie) * 100,
-                'percent_bom': (alunos_bons_serie / total_notas_serie) * 100,
-                'percent_ruim': (alunos_ruins_serie / total_notas_serie) * 100,
-            }
-        else:
-            stats_por_serie[serie] = {
-                'total_alunos': total_alunos_serie,
-                'percent_otimo': 0,
-                'percent_bom': 0,
-                'percent_ruim': 0,
-            }
-
-    labels = ["Média ≥ 8", "Média 5 a 8", "Média < 5"]
-    totals = [round(percent_otimo, 2), round(percent_bom, 2), round(percent_ruim, 2)]
-    colors = ['#11998e', '#f7971e', '#e53935']
-    detalhes = [
-        [nota.aluno.nome for nota in Nota.objects.filter(media__gte=8).select_related('aluno')],
-        [nota.aluno.nome for nota in Nota.objects.filter(media__lt=8, media__gte=5).select_related('aluno')],
-        [nota.aluno.nome for nota in Nota.objects.filter(media__lt=5).select_related('aluno')],
-    ]
-
+    # NOVAS ESTATÍSTICAS
+    alunos_masculino = Aluno.objects.filter(sexo='M').count()
+    alunos_feminino = Aluno.objects.filter(sexo='F').count()
+    alunos_nao_informado = Aluno.objects.filter(sexo='NI').count()
+    alunos_com_deficiencia = Aluno.objects.filter(deficiencia='S').count()
+    
+    # NOVAS ESTATÍSTICAS: FAIXA ETÁRIA
+    hoje = date.today()
+    alunos_ate_7 = 0
+    alunos_8_a_10 = 0
+    alunos_11_a_13 = 0
+    alunos_14_acima = 0
+    
+    for aluno in Aluno.objects.all():
+        if aluno.data_nascimento:
+            idade = hoje.year - aluno.data_nascimento.year - ((hoje.month, hoje.day) < (aluno.data_nascimento.month, aluno.data_nascimento.day))
+            if idade <= 7:
+                alunos_ate_7 += 1
+            elif 8 <= idade <= 10:
+                alunos_8_a_10 += 1
+            elif 11 <= idade <= 13:
+                alunos_11_a_13 += 1
+            elif idade >= 14:
+                alunos_14_acima += 1
+    
+    # O dashboard agora terá um novo contexto
     context = {
         'total_alunos': total_alunos,
-        'percent_otimo': percent_otimo,
-        'percent_bom': percent_bom,
-        'percent_ruim': percent_ruim,
-        'stats_por_serie': stats_por_serie,
-        'labels': labels,
-        'totals': totals,
-        'colors': colors,
-        'detalhes': detalhes,
+        'alunos_masculino': alunos_masculino,
+        'alunos_feminino': alunos_feminino,
+        'alunos_nao_informado': alunos_nao_informado,
+        'alunos_com_deficiencia': alunos_com_deficiencia,
+        'alunos_ate_7': alunos_ate_7,
+        'alunos_8_a_10': alunos_8_a_10,
+        'alunos_11_a_13': alunos_11_a_13,
+        'alunos_14_acima': alunos_14_acima,
     }
     return render(request, 'dashboard.html', context)

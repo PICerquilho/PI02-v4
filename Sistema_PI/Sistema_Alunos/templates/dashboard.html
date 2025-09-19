@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Notas</title>
+    <title>Dashboard de Alunos</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -45,6 +45,9 @@
         .bg-gradient-green { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .bg-gradient-yellow { background: linear-gradient(45deg, #f7971e, #ffd200); }
         .bg-gradient-red { background: linear-gradient(45deg, #e53935, #e35d5b); }
+        /* NOVAS CLASSES DE COR ADICIONADAS */
+        .bg-gradient-orange { background: linear-gradient(45deg, #FF7B00, #FFD200); }
+        .bg-gradient-purple { background: linear-gradient(45deg, #6a11cb, #2575fc); }
         .chart-container {
             position: relative;
             height: 40vh;
@@ -76,133 +79,173 @@
     </header>
 
     <div class="container mt-5">
-        <h2 class="text-center mb-5">📊 Dashboard de Notas</h2>
+        <h2 class="text-center mb-5">📊 Dashboard de Alunos</h2>
 
         <div class="row text-center mb-5 gx-4">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="stat-card bg-gradient-blue shadow-sm">
                     <i class="fas fa-user-graduate stat-icon"></i>
                     <h5>Total de Alunos</h5>
                     <h3 class="fw-bold">{{ total_alunos }}</h3>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="stat-card bg-gradient-green shadow-sm">
-                    <i class="fas fa-star stat-icon"></i>
-                    <h5>Média ≥ 8</h5>
-                    <h3 class="fw-bold">{{ percent_otimo|floatformat:2 }}%</h3>
+                    <i class="fas fa-wheelchair stat-icon"></i>
+                    <h5>Alunos com Deficiência</h5>
+                    <h3 class="fw-bold">{{ alunos_com_deficiencia }}</h3>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="stat-card bg-gradient-yellow shadow-sm">
-                    <i class="fas fa-chart-line stat-icon"></i>
-                    <h5>Média 5 a 8</h5>
-                    <h3 class="fw-bold">{{ percent_bom|floatformat:2 }}%</h3>
+                    <i class="fas fa-child stat-icon"></i>
+                    <h5>Até 7 anos</h5>
+                    <h3 class="fw-bold">{{ alunos_ate_7 }}</h3>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="stat-card bg-gradient-red shadow-sm">
-                    <i class="fas fa-exclamation-triangle stat-icon"></i>
-                    <h5>Média &lt; 5</h5>
-                    <h3 class="fw-bold">{{ percent_ruim|floatformat:2 }}%</h3>
+                    <i class="fas fa-child stat-icon"></i>
+                    <h5>8 a 10 anos</h5>
+                    <h3 class="fw-bold">{{ alunos_8_a_10 }}</h3>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card bg-gradient-orange shadow-sm">
+                    <i class="fas fa-child stat-icon"></i>
+                    <h5>11 a 13 anos</h5>
+                    <h3 class="fw-bold">{{ alunos_11_a_13 }}</h3>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card bg-gradient-purple shadow-sm">
+                    <i class="fas fa-child stat-icon"></i>
+                    <h5>14 ou mais</h5>
+                    <h3 class="fw-bold">{{ alunos_14_acima }}</h3>
                 </div>
             </div>
         </div>
 
-        <div class="card shadow-sm mb-5 p-4">
-            <h4 class="card-title text-center mb-4">📈 Distribuição de Notas por Categoria</h4>
-            <div class="chart-container">
-                <canvas id="graficoNotas"></canvas>
-            </div>
-        </div>
-
-        <div class="card shadow-sm p-4">
-            <h4 class="card-title text-center mb-4">📚 Estatísticas por Série</h4>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                {% for serie, stats in stats_por_serie.items %}
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ serie }}</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <strong>Média ≥ 8:</strong>
-                                        <div class="progress" style="height: 15px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ stats.percent_otimo|floatformat:2 }}%; background-color: #11998e;" aria-valuenow="{{ stats.percent_otimo|floatformat:2 }}" aria-valuemin="0" aria-valuemax="100">
-                                                {{ stats.percent_otimo|floatformat:2 }}%
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <strong>Média 5 a 8:</strong>
-                                        <div class="progress" style="height: 15px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ stats.percent_bom|floatformat:2 }}%; background-color: #f7971e;" aria-valuenow="{{ stats.percent_bom|floatformat:2 }}" aria-valuemin="0" aria-valuemax="100">
-                                                {{ stats.percent_bom|floatformat:2 }}%
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <strong>Média &lt; 5:</strong>
-                                        <div class="progress" style="height: 15px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ stats.percent_ruim|floatformat:2 }}%; background-color: #e53935;" aria-valuenow="{{ stats.percent_ruim|floatformat:2 }}" aria-valuemin="0" aria-valuemax="100">
-                                                {{ stats.percent_ruim|floatformat:2 }}%
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div class="text-center mt-3">
-                                    <strong>Total de Alunos:</strong> {{ stats.total_alunos }}
-                                </div>
-                            </div>
-                        </div>
+        <div class="row mb-5 gx-4 justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm p-4">
+                    <h4 class="card-title text-center mb-4">Gráfico de Alunos por Sexo</h4>
+                    <div class="chart-container">
+                        <canvas id="graficoSexo"></canvas>
                     </div>
-                {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm p-4">
+                    <h4 class="card-title text-center mb-4">Gráfico de Alunos com Deficiência</h4>
+                    <div class="chart-container">
+                        <canvas id="graficoDeficiencia"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mt-4">
+                <div class="card shadow-sm p-4">
+                    <h4 class="card-title text-center mb-4">Gráfico de Alunos por Faixa Etária</h4>
+                    <div class="chart-container">
+                        <canvas id="graficoFaixaEtaria"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('graficoNotas');
-        const detalhes = {{ detalhes|safe }};
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ labels|safe }},
-                datasets: [{
-                    label: 'Número de alunos',
-                    data: {{ totals|safe }},
-                    backgroundColor: {{ colors|safe }},
-                    borderRadius: 10
-                }]
-            },
+        // Gráfico de Rosca (Sexo)
+        const ctxSexo = document.getElementById('graficoSexo');
+        const dataSexo = {
+            labels: ['Masculino', 'Feminino', 'Não Informado'],
+            datasets: [{
+                data: [{{ alunos_masculino }}, {{ alunos_feminino }}, {{ alunos_nao_informado }}],
+                backgroundColor: ['#5b86e5', '#ff99b3', '#808080'],
+            }]
+        };
+        new Chart(ctxSexo, {
+            type: 'doughnut',
+            data: dataSexo,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    legend: {
+                        position: 'top',
+                    },
                     tooltip: {
-                        usePointStyle: true,
                         callbacks: {
                             label: function(context) {
-                                let idx = context.dataIndex;
-                                return detalhes[idx].map(aluno => '• ' + aluno);
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed;
+                                }
+                                return label;
                             }
                         }
-                    },
-                    legend: {
-                        labels: {
-                            font: { size: 14, family: 'Poppins' }
-                        }
                     }
-                },
+                }
+            }
+        });
+
+        // Gráfico de Barras (Deficiência)
+        const ctxDeficiencia = document.getElementById('graficoDeficiencia');
+        const dataDeficiencia = {
+            labels: ['Com Deficiência', 'Sem Deficiência'],
+            datasets: [{
+                label: 'Número de Alunos',
+                data: [{{ alunos_com_deficiencia }}, {{ total_alunos }} - {{ alunos_com_deficiencia }}],
+                backgroundColor: ['#e53935', '#11998e'],
+                borderRadius: 10
+            }]
+        };
+        new Chart(ctxDeficiencia, {
+            type: 'bar',
+            data: dataDeficiencia,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { stepSize: 1, precision: 0 },
-                        title: { display: true, text: 'Quantidade de Alunos' }
-                    },
-                    x: {
-                        title: { display: true, text: 'Faixa de Notas' }
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        // NOVO GRÁFICO: Faixa Etária
+        const ctxFaixaEtaria = document.getElementById('graficoFaixaEtaria');
+        const dataFaixaEtaria = {
+            labels: ['Até 7 anos', '8 a 10 anos', '11 a 13 anos', '14+ anos'],
+            datasets: [{
+                label: 'Número de Alunos',
+                data: [{{ alunos_ate_7 }}, {{ alunos_8_a_10 }}, {{ alunos_11_a_13 }}, {{ alunos_14_acima }}],
+                backgroundColor: ['#5b86e5', '#11998e', '#f7971e', '#e53935'],
+                borderRadius: 10
+            }]
+        };
+        new Chart(ctxFaixaEtaria, {
+            type: 'bar',
+            data: dataFaixaEtaria,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
                     }
                 }
             }

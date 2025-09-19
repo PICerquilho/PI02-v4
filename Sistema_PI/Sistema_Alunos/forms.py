@@ -1,13 +1,12 @@
 from django import forms
 from .models import Aluno
-from .models import Nota
 
 class AlunoForm(forms.ModelForm):
     data_nascimento = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Aluno
-        fields = '__all__'  # Isto garante que todos os campos, incluindo o 'endereco', sejam exibidos no formulário.
+        fields = '__all__'
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
             'nome_social': forms.TextInput(attrs={'class': 'form-control'}),
@@ -23,21 +22,11 @@ class AlunoForm(forms.ModelForm):
             'periodo': forms.Select(attrs={'class': 'form-control'}),
             'foto': forms.FileInput(attrs={'class': 'form-control'}),
             'endereco': forms.Textarea(attrs={'class': 'form-control'}),
-            
+            'sexo': forms.Select(attrs={'class': 'form-control'}),
+            'deficiencia': forms.Select(attrs={'class': 'form-control'}),
+            'deficiencia_qual': forms.TextInput(attrs={'class': 'form-control'}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.instance or not self.instance.pk:
             self.fields['foto'].required = True
-
-
-class NotaForm(forms.ModelForm):
-    class Meta:
-        model = Nota
-        fields = ['bimestre1', 'bimestre2', 'bimestre3', 'bimestre4']
-        widgets = {
-            'bimestre1': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'min': 0, 'max': 10}),
-            'bimestre2': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'min': 0, 'max': 10}),
-            'bimestre3': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'min': 0, 'max': 10}),
-            'bimestre4': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'min': 0, 'max': 10}),
-        }
