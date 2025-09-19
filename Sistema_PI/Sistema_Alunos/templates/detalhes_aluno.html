@@ -1,0 +1,182 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Aluno</title>
+
+    <style>
+        /* Estilos gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .header-image img {
+            height: 50px;
+        }
+
+        /* Container principal */
+        .detalhes-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        /* Foto do aluno */
+        .foto-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .foto-aluno {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 3px solid #0044cc;
+        }
+
+        /* Informações do aluno */
+        .informacoes-aluno p {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: left;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .informacoes-aluno p strong {
+            color: #0044cc;
+        }
+
+        /* Botões de Ação */
+        .acoes-aluno {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .acoes-aluno a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px 12px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .acoes-aluno a:hover {
+            background-color: #ddd;
+        }
+
+        .acoes-aluno a i {
+            margin-right: 5px;
+        }
+
+        .editar-botao i {
+            /* Adicione estilos específicos para o ícone de lápis se necessário */
+        }
+
+        .excluir-botao i {
+            color: #d9534f; /* Vermelho para indicar perigo */
+            /* Adicione estilos específicos para o ícone de delete/aviso se necessário */
+        }
+
+        /* Botão Voltar */
+        .voltar-home {
+            margin-top: 20px;
+        }
+
+        .voltar-home button {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .voltar-home button:hover {
+            background-color: #003399;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Identificação do Aluno</h1>
+        <div class="header-image">
+            <img src="{% static 'imagens/brasao3.png' %}" alt="Imagem do Cabeçalho">
+        </div>
+    </header>
+
+    <div class="detalhes-container">
+        <div class="foto-container">
+            {% if aluno.foto %}
+                <img src="{{ aluno.foto.url }}" alt="Foto do Aluno" class="foto-aluno">
+            {% else %}
+                <p>Nenhuma foto cadastrada.</p>
+            {% endif %}
+        </div>
+
+        <div class="informacoes-aluno">
+            <p><strong>Nome:</strong> {{ aluno.nome_social}}</p>
+            <p><strong>RA:</strong> {{ aluno.id_aluno }}</p>
+            <p><strong>RG:</strong> {{ aluno.rg }}</p>
+            <p><strong>CPF:</strong> {{ aluno.cpf }}</p>
+            <p><strong>Série:</strong> {{ aluno.serie }}</p>
+            <p><strong>Período:</strong> {{ aluno.periodo }}</p>
+            <p><strong>Contato:</strong> {{ aluno.contato }}</p>
+            <p><strong>Contato Emergencial:</strong> {{ aluno.contato_emergencial }}</p>
+            <div class="acoes-aluno">
+                <a href="{% url 'editar_aluno' aluno.id_aluno %}" class="editar-botao"><i class="fas fa-pencil"></i> Editar</a>
+                <a href="{% url 'excluir_aluno' aluno.id_aluno %}" class="excluir-botao"><i class="fas fa-trash-can"></i><i class="fas fa-exclamation-triangle"></i> Excluir</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="voltar-home">
+        <a href="{% url 'index' %}"><button>Voltar para a Home</button></a>
+    </div>
+</body>
+</html>

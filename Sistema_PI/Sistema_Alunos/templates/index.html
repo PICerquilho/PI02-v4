@@ -1,0 +1,153 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e consulta de alunos.</title>
+    <link rel="shortcut icon" href="{% static 'imagens/brasao.png' %}" type="image/x-icon">
+
+    <!-- Link para o Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/media-query.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Cadastro de Aluno</h1>
+        <div class="header-image">
+            <img src="{% static 'imagens/brasao3.png' %}" alt="Imagem do Cabeçalho">
+        </div>
+        <nav>
+            <div class="nav-buttons">
+                <a href="{% url 'index' %}"><button>🏠 Home</button></a>
+                <a href="{% url 'dashboard' %}"><button>📊 Dashboard</button>
+                </a>
+                <a href="{% url 'cadastro' %}">
+                    <button><i class="fas fa-user-plus"></i> Cadastrar Aluno</button>
+                </a>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">{% csrf_token %}
+                <button type="submit">🚪 Logout</button>
+</form>
+                
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <input type="text" id="busca" placeholder="Digite o Nome Social, RA, RG, Série ou Período">
+        
+        <!-- Filtros adicionais -->
+        <select id="filtroSerie" class="form-control">
+            <option value="">Selecione o Ano</option>
+            <option value="1ª Ano">1ª Ano</option>
+            <option value="2ª Ano">2ª Ano</option>
+            <option value="3ª Ano">3ª Ano</option>
+            <option value="4ª Ano">4ª Ano</option>
+            <option value="5ª Ano">5ª Ano</option>
+            <option value="6ª Ano">6ª Ano</option>
+            <option value="7ª Ano">7ª Ano</option>
+            <option value="8ª Ano">8ª Ano</option>
+            <option value="9ª Ano">9ª Ano</option>
+        </select>
+    
+        <select id="filtroTurma" class="form-control">
+            <option value="">Selecione a Turma</option>
+            <option value="A">Turma A</option>
+            <option value="B">Turma B</option>
+            <option value="C">Turma C</option>
+        </select>
+    
+        <select id="filtroPeriodo" class="form-control">
+            <option value="">Selecione o Período</option>
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+        </select>
+    
+        <button onclick="buscarAluno()">Buscar</button>
+    
+        <table id="tabelaAlunos" style="display: none;"> <!-- Tabela inicialmente oculta -->
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>RA</th>
+                    <th>Série</th>
+                    <th>Período</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Os alunos serão inseridos aqui via JavaScript -->
+            </tbody>
+        </table>
+    
+        <!-- Botão Limpar Busca, inicialmente invisível -->
+        <button id="limparBusca" style="display: none;" onclick="limparBusca()">Limpar Busca</button>
+    </div>
+
+    <script>
+        function buscarAluno() {
+            const query = document.getElementById('busca').value.trim();  // Nome ou RA/RG
+            const serie = document.getElementById('filtroSerie').value;
+            const turma = document.getElementById('filtroTurma').value;
+            const periodo = document.getElementById('filtroPeriodo').value;
+        
+            // Enviar requisição AJAX para o backend
+            fetch(`/buscar_aluno/?q=${query}&serie=${serie}&turma=${turma}&periodo=${periodo}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tabela = document.getElementById('tabelaAlunos').getElementsByTagName('tbody')[0];
+                    tabela.innerHTML = '';  // Limpa a tabela antes de preencher
+        
+                    if (data.length > 0) {
+                        // Torna a tabela visível ao clicar no botão "Buscar"
+                        document.getElementById('tabelaAlunos').style.display = 'table';
+                        // Exibe o botão "Limpar Busca"
+                        document.getElementById('limparBusca').style.display = 'inline-block';
+        
+                        data.forEach(aluno => {
+                            let row = tabela.insertRow();
+        
+                            let cellFoto = row.insertCell(0);
+                            let cellNome = row.insertCell(1);
+                            let cellRA = row.insertCell(2);
+                            let cellSerie = row.insertCell(3);
+                            let cellPeriodo = row.insertCell(4);
+        
+                            // Adiciona um evento de clique na linha para redirecionar para a página de detalhes
+                            row.onclick = function () {
+                                window.location.href = `/detalhes_aluno/${aluno.id_aluno}/`;  // Redireciona para a página de detalhes
+                            };
+        
+                            cellFoto.innerHTML = `<img src="${aluno.foto}" alt="Foto do Aluno" width="50" height="50">`;
+                            cellNome.innerHTML = aluno.nome;
+                            cellRA.innerHTML = aluno.id_aluno;
+                            cellSerie.innerHTML = aluno.serie;
+                            cellPeriodo.innerHTML = aluno.periodo;
+                        });
+                    } else {
+                        // Caso nenhum aluno seja encontrado, a tabela ficará visível e exibirá uma mensagem
+                        document.getElementById('tabelaAlunos').style.display = 'table';
+                        tabela.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum aluno encontrado.</td></tr>';
+                        // Exibe o botão "Limpar Busca"
+                        document.getElementById('limparBusca').style.display = 'inline-block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar aluno:', error);
+                });
+        }
+        
+        // Função para limpar a busca
+        function limparBusca() {
+            document.getElementById('busca').value = '';  // Limpa o campo de busca
+            document.getElementById('tabelaAlunos').style.display = 'none';  // Esconde a tabela
+            document.getElementById('limparBusca').style.display = 'none';  // Esconde o botão Limpar Busca
+        }
+    </script>
+
+</body>
+</html>

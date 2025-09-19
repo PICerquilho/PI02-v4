@@ -1,0 +1,65 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Exclusão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        h1 {
+            color: #d9534f; /* Vermelho para indicar perigo */
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .confirmar {
+            background-color: #d9534f;
+            color: white;
+        }
+        .cancelar {
+            background-color: #5cb85c;
+            color: white;
+            text-decoration: none;
+        }
+        .cancelar:hover, .confirmar:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Confirmar Exclusão</h1>
+        <p>Tem certeza que deseja excluir o aluno <strong>{{ aluno.nome_social|default:aluno.nome }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="confirmar">Excluir</button>
+            <a href="{% url 'detalhes_aluno' aluno.id_aluno %}" class="cancelar">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

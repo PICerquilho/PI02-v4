@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e consulta de alunos.</title>
+    <link rel="shortcut icon" href="{% static 'imagens/brasao.png' %}" type="image/x-icon">
+    <script src="{% static 'js/script.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/media-query.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Cadastro de Aluno</h1>
+        <div class="header-image">
+            <img src="{% static 'imagens/brasao3.png' %}" alt="Imagem do Cabeçalho">
+        </div>
+        <nav>
+            <a href="{% url 'index' %}">
+                <button>🏠 Home</button>
+            </a>
+            <a href="{% url 'logout' %}">
+                <button>🚪 Logout</button>
+            </a>
+        </nav>
+    </header>
+
+    <input type="text" id="busca" placeholder="Digite o Nome Social, RA, RG, Série ou Período">
+    <button onclick="buscarAluno()">Buscar</button>
+
+    <div id="resultados"></div>
+
+    <a href="{% url 'cadastro' %}"><button>Cadastrar Aluno</button></a>
+
+    <script>
+        function buscarAluno() {
+            const query = document.getElementById('busca').value.trim();
+            console.log('Buscando por:', query); // Adiciona um log para verificar o valor do campo de busca
+
+            if (query === "") {
+                document.getElementById('resultados').innerHTML = '<p>Por favor, digite algo para buscar.</p>';
+                return; // Se o campo estiver vazio, não faz a requisição
+            }
+
+            // Enviar requisição AJAX para o backend
+            fetch(`/buscar_aluno/?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultadosDiv = document.getElementById('resultados');
+                    resultadosDiv.innerHTML = '';  // Limpar os resultados anteriores
+
+                    if (data.length > 0) {
+                        let tabela = `
+                            <table border="1">
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nome</th>
+                                    <th>RA</th>
+                                    <th>Série</th>
+                                    <th>Período</th>
+                                </tr>
+                        `;
+
+                        data.forEach(aluno => {
+                            tabela += `
+                                <tr>
+                                    <td><img src="${aluno.foto}" alt="Foto do Aluno" width="50" height="50"></td>
+                                    <td>${aluno.nome_social || aluno.nome}</td>
+                                    <td>${aluno.id_aluno}</td>
+                                    <td>${aluno.serie}</td>
+                                    <td>${aluno.periodo}</td>
+                                </tr>
+                            `;
+                        });
+
+                        tabela += `</table>`;
+                        resultadosDiv.innerHTML = tabela; // Adiciona a tabela com os resultados
+                    } else {
+                        resultadosDiv.innerHTML = '<p>Nenhum aluno encontrado.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar aluno:', error);
+                    document.getElementById('resultados').innerHTML = '<p>Ocorreu um erro ao buscar os alunos.</p>';
+                });
+        }
+    </script>
+</body>
+</html>
