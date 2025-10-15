@@ -1,153 +1,198 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro e consulta de alunos.</title>
+    <title>Cadastro e Consulta de Alunos</title>
     <link rel="shortcut icon" href="{% static 'imagens/brasao.png' %}" type="image/x-icon">
 
-    <!-- Link para o Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Fontes e Frameworks -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <script src="{% static 'js/script.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/media-query.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #E0F2F7;
+        }
+
+        /* Cabeçalho fixo visualmente igual em todas as páginas */
+        header {
+            background-color: #0059B3 !important;
+        }
+
+        .navbar-brand span {
+            font-weight: 600;
+            color: white;
+        }
+
+        .navbar-nav .nav-link {
+            color: #FFFFFF !important;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #E0F2F7 !important;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .table-hover tbody tr:hover {
+            cursor: pointer;
+            background-color: #f1f1f1;
+        }
+
+        .aluno-foto {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-primary.bg-custom-blue {
+            background-color: #0059B3 !important;
+            border: none;
+        }
+
+        .btn-primary.bg-custom-blue:hover {
+            background-color: #004499 !important;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Cadastro de Aluno</h1>
-        <div class="header-image">
-            <img src="{% static 'imagens/brasao3.png' %}" alt="Imagem do Cabeçalho">
-        </div>
-        <nav>
-            <div class="nav-buttons">
-                <a href="{% url 'index' %}"><button>🏠 Home</button></a>
-                <a href="{% url 'dashboard' %}"><button>📊 Dashboard</button>
+
+    <!-- Cabeçalho unificado -->
+    <header class="shadow-sm p-3 mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0059B3;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                    <img src="{% static 'imagens/brasao3.png' %}" alt="Brasão" width="40" class="me-2">
+                    <span>Sistema Escolar</span>
                 </a>
-                <a href="{% url 'cadastro' %}">
-                    <button><i class="fas fa-user-plus"></i> Cadastrar Aluno</button>
-                </a>
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">{% csrf_token %}
-                <button type="submit">🚪 Logout</button>
-</form>
-                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="{% url 'index' %}">🏠 Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'cadastro' %}"><i class="fas fa-user-plus"></i> Cadastrar Aluno</a></li>
+                    </ul>
+                    <form class="d-flex" method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light">🚪 Logout</button>
+                    </form>
+                </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <input type="text" id="busca" placeholder="Digite o Nome Social, RA, RG, Série ou Período">
-        
-        <!-- Filtros adicionais -->
-        <select id="filtroSerie" class="form-control">
-            <option value="">Selecione o Ano</option>
-            <option value="1ª Ano">1ª Ano</option>
-            <option value="2ª Ano">2ª Ano</option>
-            <option value="3ª Ano">3ª Ano</option>
-            <option value="4ª Ano">4ª Ano</option>
-            <option value="5ª Ano">5ª Ano</option>
-            <option value="6ª Ano">6ª Ano</option>
-            <option value="7ª Ano">7ª Ano</option>
-            <option value="8ª Ano">8ª Ano</option>
-            <option value="9ª Ano">9ª Ano</option>
-        </select>
-    
-        <select id="filtroTurma" class="form-control">
-            <option value="">Selecione a Turma</option>
-            <option value="A">Turma A</option>
-            <option value="B">Turma B</option>
-            <option value="C">Turma C</option>
-        </select>
-    
-        <select id="filtroPeriodo" class="form-control">
-            <option value="">Selecione o Período</option>
-            <option value="Manhã">Manhã</option>
-            <option value="Tarde">Tarde</option>
-        </select>
-    
-        <button onclick="buscarAluno()">Buscar</button>
-    
-        <table id="tabelaAlunos" style="display: none;"> <!-- Tabela inicialmente oculta -->
-            <thead>
+    <!-- Conteúdo principal -->
+    <main class="container">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">🔍 Filtros de Busca</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-12">
+                        <label for="busca" class="form-label">Buscar por Nome, RA ou RG</label>
+                        <input type="text" id="busca" class="form-control" placeholder="Digite para buscar...">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtroSerie" class="form-label">Ano</label>
+                        <select id="filtroSerie" class="form-select">
+                            <option value="">Todos os anos</option>
+                            {% for i in "123456789" %}
+                                <option value="{{ i }}ª Ano">{{ i }}ª Ano</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroTurma" class="form-label">Turma</label>
+                        <select id="filtroTurma" class="form-select">
+                            <option value="">Todas as turmas</option>
+                            <option value="A">Turma A</option>
+                            <option value="B">Turma B</option>
+                            <option value="C">Turma C</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroPeriodo" class="form-label">Período</label>
+                        <select id="filtroPeriodo" class="form-select">
+                            <option value="">Todos os períodos</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 bg-custom-blue" onclick="buscarAluno()">Buscar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4" id="areaResultados" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5>Resultados da Busca</h5>
+                <button id="limparBusca" class="btn btn-secondary btn-sm bg-custom-blue" onclick="limparBusca()">Limpar Busca</button>
+            </div>
+            <table id="tabelaAlunos" class="table table-hover align-middle">
+                <thead class="table-light">
                 <tr>
-                    <th>Foto</th>
+                    <th style="width: 80px;">Foto</th>
                     <th>Nome</th>
                     <th>RA</th>
                     <th>Série</th>
                     <th>Período</th>
                 </tr>
-            </thead>
-            <tbody>
-                <!-- Os alunos serão inseridos aqui via JavaScript -->
-            </tbody>
-        </table>
-    
-        <!-- Botão Limpar Busca, inicialmente invisível -->
-        <button id="limparBusca" style="display: none;" onclick="limparBusca()">Limpar Busca</button>
-    </div>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
 
     <script>
         function buscarAluno() {
-            const query = document.getElementById('busca').value.trim();  // Nome ou RA/RG
+            const query = document.getElementById('busca').value.trim();
             const serie = document.getElementById('filtroSerie').value;
             const turma = document.getElementById('filtroTurma').value;
             const periodo = document.getElementById('filtroPeriodo').value;
-        
-            // Enviar requisição AJAX para o backend
+
             fetch(`/buscar_aluno/?q=${query}&serie=${serie}&turma=${turma}&periodo=${periodo}`)
                 .then(response => response.json())
                 .then(data => {
+                    const areaResultados = document.getElementById('areaResultados');
                     const tabela = document.getElementById('tabelaAlunos').getElementsByTagName('tbody')[0];
-                    tabela.innerHTML = '';  // Limpa a tabela antes de preencher
-        
+                    tabela.innerHTML = '';
+                    areaResultados.style.display = 'block';
+
                     if (data.length > 0) {
-                        // Torna a tabela visível ao clicar no botão "Buscar"
-                        document.getElementById('tabelaAlunos').style.display = 'table';
-                        // Exibe o botão "Limpar Busca"
-                        document.getElementById('limparBusca').style.display = 'inline-block';
-        
                         data.forEach(aluno => {
-                            let row = tabela.insertRow();
-        
-                            let cellFoto = row.insertCell(0);
-                            let cellNome = row.insertCell(1);
-                            let cellRA = row.insertCell(2);
-                            let cellSerie = row.insertCell(3);
-                            let cellPeriodo = row.insertCell(4);
-        
-                            // Adiciona um evento de clique na linha para redirecionar para a página de detalhes
-                            row.onclick = function () {
-                                window.location.href = `/detalhes_aluno/${aluno.id_aluno}/`;  // Redireciona para a página de detalhes
-                            };
-        
-                            cellFoto.innerHTML = `<img src="${aluno.foto}" alt="Foto do Aluno" width="50" height="50">`;
-                            cellNome.innerHTML = aluno.nome;
-                            cellRA.innerHTML = aluno.id_aluno;
-                            cellSerie.innerHTML = aluno.serie;
-                            cellPeriodo.innerHTML = aluno.periodo;
+                            const row = tabela.insertRow();
+                            row.onclick = () => window.location.href = `/detalhes_aluno/${aluno.id_aluno}/`;
+                            row.innerHTML = `
+                                <td><img src="${aluno.foto}" alt="Foto de ${aluno.nome}" class="aluno-foto"></td>
+                                <td>${aluno.nome}</td>
+                                <td>${aluno.id_aluno}</td>
+                                <td>${aluno.serie}</td>
+                                <td>${aluno.periodo}</td>
+                            `;
                         });
                     } else {
-                        // Caso nenhum aluno seja encontrado, a tabela ficará visível e exibirá uma mensagem
-                        document.getElementById('tabelaAlunos').style.display = 'table';
-                        tabela.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum aluno encontrado.</td></tr>';
-                        // Exibe o botão "Limpar Busca"
-                        document.getElementById('limparBusca').style.display = 'inline-block';
+                        tabela.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum aluno encontrado.</td></tr>';
                     }
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar aluno:', error);
                 });
         }
-        
-        // Função para limpar a busca
+
         function limparBusca() {
-            document.getElementById('busca').value = '';  // Limpa o campo de busca
-            document.getElementById('tabelaAlunos').style.display = 'none';  // Esconde a tabela
-            document.getElementById('limparBusca').style.display = 'none';  // Esconde o botão Limpar Busca
+            ['busca', 'filtroSerie', 'filtroTurma', 'filtroPeriodo'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('areaResultados').style.display = 'none';
         }
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

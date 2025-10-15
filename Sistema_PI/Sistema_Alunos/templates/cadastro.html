@@ -5,135 +5,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Aluno</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Estilos gerais */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
         body {
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background-color: #E0F2F7;
             color: #333;
-            text-align: center;
-            padding: 20px;
         }
 
-        /* Container principal */
+        header {
+            background-color: #0059B3;
+        }
+
+        .navbar-brand span {
+            font-weight: 600;
+            color: white;
+        }
+
+        .navbar-nav .nav-link {
+            color: #FFFFFF !important;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #E0F2F7 !important;
+        }
+
         .container {
             max-width: 600px;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: auto;
-            text-align: left;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 60px;
         }
 
         h2 {
-            color: #0044cc;
+            color: #0059B3;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
-        /* Campos do formulário */
-        form p {
-            margin-bottom: 15px;
+        label {
+            font-weight: 500;
         }
 
-        form input, form select, form textarea {
+        input, select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
         }
 
-        /* Botões */
+        input:focus, select:focus, textarea:focus {
+            border-color: #0059B3;
+            outline: none;
+        }
+
         .buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 20px;
         }
 
-        button {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        button, .btn-voltar {
+            padding: 10px;
             font-size: 16px;
-            width: 100%;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        button:hover {
-            background-color: #003399;
+        .btn-primary {
+            background-color: #0059B3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #004499;
         }
 
         .btn-voltar {
             background-color: #777;
+            color: white;
+            text-decoration: none;
+            text-align: center;
         }
 
         .btn-voltar:hover {
             background-color: #555;
         }
 
-        /* Ajuste para responsividade */
+        /* Campos de erro */
+        .errorlist {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsividade */
         @media (max-width: 768px) {
             .container {
                 width: 90%;
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <h2>Cadastro de Aluno</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            {% if field.name == 'deficiencia_qual' %}
-                <div id="deficiencia_qual_div" style="display: none;">
-                    {{ field.label_tag }}
-                    {{ field }}
+    <!-- Cabeçalho padronizado -->
+    <header class="shadow-sm p-3 mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0059B3;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                    <img src="{% static 'imagens/brasao3.png' %}" alt="Brasão" width="40" class="me-2">
+                    <span>Sistema Escolar</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">🏠 Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{% url 'cadastro' %}"><i class="fas fa-user-plus"></i> Cadastrar Aluno</a></li>
+                    </ul>
+                    <form class="d-flex" method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light">🚪 Logout</button>
+                    </form>
                 </div>
-            {% else %}
-                <p>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo -->
+    <div class="container">
+        <h2>Cadastro de Aluno</h2>
+
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3" id="{% if field.name == 'deficiencia_qual' %}deficiencia_qual_div{% endif %}" {% if field.name == 'deficiencia_qual' %}style="display:none;"{% endif %}>
                     {{ field.label_tag }}
                     {{ field }}
-                </p>
-            {% endif %}
-        {% endfor %}
-        <div class="buttons">
-            <button type="submit">Cadastrar</button>
-            <a href="{% url 'index' %}" class="btn btn-voltar">Voltar para Home</a>
-        </div>
-    </form>
-</div>
+                    {% if field.errors %}
+                        <div class="errorlist">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="buttons">
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <a href="{% url 'index' %}" class="btn-voltar">Voltar para Home</a>
+            </div>
+        </form>
+    </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const deficienciaField = document.getElementById('id_deficiencia');
-        const deficienciaQualDiv = document.getElementById('deficiencia_qual_div');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deficienciaField = document.getElementById('id_deficiencia');
+            const deficienciaQualDiv = document.getElementById('deficiencia_qual_div');
 
-        function toggleDeficienciaQual() {
-            if (deficienciaField.value === 'S') {
-                deficienciaQualDiv.style.display = 'block';
-            } else {
-                deficienciaQualDiv.style.display = 'none';
+            function toggleDeficienciaQual() {
+                if (deficienciaField && deficienciaQualDiv) {
+                    deficienciaQualDiv.style.display = deficienciaField.value === 'S' ? 'block' : 'none';
+                }
             }
-        }
 
-        deficienciaField.addEventListener('change', toggleDeficienciaQual);
-        toggleDeficienciaQual();
-    });
-</script>
+            if (deficienciaField) {
+                deficienciaField.addEventListener('change', toggleDeficienciaQual);
+                toggleDeficienciaQual();
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
