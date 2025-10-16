@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: ./Sistema_PI
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Sistema_PI:/app
+    environment:
+      - DOMAIN=cidadedasrosas.shop
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
+
+  localxpose:
+    image: localxpose/localxpose
+    container_name: localxpose
+    command: tunnel http --reserved-domain cidadedasrosas.shop --to localhost:8000
+    environment:
+      - LOCALXPOSE_TOKEN=${LOCALXPOSE_TOKEN}
+    restart: unless-stopped
+    depends_on:
+      - web
+    network_mode: host
