@@ -22,11 +22,43 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-8gfta$(!=&!23%s0ke02hr%9^^o9tpfi@o2ijx$!tp$g051_4)'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1', 
+    '177.128.8.236',
+    'cidadedasrosas.shop',
+    'www.cidadedasrosas.shop',
+    'cidadedasrosas.duckdns.org',
+    '.cidadedasrosas.shop',
+    'web',
+    '0.0.0.0',
+    'zzlxwvvwec.loclx.io',
+    '.loclx.io',
+    'ntzo99tcym.loclx.io',
+    # ADICIONE ESTE para o Cloudflare Tunnel:
+    'b21a36a6-32a8-49a6-b0d9-98fcf52d4f0a.cfargotunnel.com',
+    '.cfargotunnel.com',
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://177.128.8.236:8000',
+    'https://cidadedasrosas.shop',
+    'https://www.cidadedasrosas.shop', 
+    'https://cidadedasrosas.duckdns.org',
+    'https://zzlxwvvwec.loclx.io',
+    'https://*.loclx.io',
+    'https://ntzo99tcym.loclx.io',
+    # ADICIONE ESTE para o Cloudflare Tunnel:
+    'https://b21a36a6-32a8-49a6-b0d9-98fcf52d4f0a.cfargotunnel.com',
+]
+# Configurações de segurança para produção
+SECURE_SSL_REDIRECT = False  # Mude para True se usar HTTPS
+SESSION_COOKIE_SECURE = False  # Mude para True se usar HTTPS
+CSRF_COOKIE_SECURE = False    # Mude para True se usar HTTPS
 
 # Application definition
 

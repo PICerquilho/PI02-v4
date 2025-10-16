@@ -1,79 +1,94 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Alunos</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4f7fa;
+            background-color: #E0F2F7;
         }
-        h2, h4 {
+
+        header {
+            background-color: #0059B3 !important;
+        }
+
+        .navbar-brand span {
             font-weight: 600;
-            color: #333;
+            color: white;
         }
-        .card {
-            border: none;
-            border-radius: 15px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            height: 100%;
+
+        .navbar-nav .nav-link {
+            color: #FFFFFF !important;
+            font-weight: 500;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+
+        .navbar-nav .nav-link:hover {
+            color: #E0F2F7 !important;
         }
+
         .stat-card {
             color: white;
             border-radius: 15px;
             padding: 20px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             text-align: center;
         }
+
         .stat-icon {
             font-size: 35px;
             margin-bottom: 10px;
         }
+
         .bg-gradient-blue { background: linear-gradient(45deg, #36d1dc, #5b86e5); }
         .bg-gradient-green { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .bg-gradient-yellow { background: linear-gradient(45deg, #f7971e, #ffd200); }
         .bg-gradient-red { background: linear-gradient(45deg, #e53935, #e35d5b); }
-        /* NOVAS CLASSES DE COR ADICIONADAS */
         .bg-gradient-orange { background: linear-gradient(45deg, #FF7B00, #FFD200); }
         .bg-gradient-purple { background: linear-gradient(45deg, #6a11cb, #2575fc); }
-        .chart-container {
-            position: relative;
-            height: 40vh;
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
         }
     </style>
 </head>
 <body>
 
-    <header class="bg-light shadow-sm p-3 mb-5">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{% url 'index' %}">Sistema Escolar</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">🏠 Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">📊 Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cadastro' %}">
-                            <i class="fas fa-user-plus"></i> Cadastrar Aluno
-                        </a>
-                    </li>
-                </ul>
-                <a class="btn btn-outline-danger" href="{% url 'logout' %}">🚪 Logout</a>
+    <!-- Cabeçalho unificado -->
+    <header class="shadow-sm p-3 mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0059B3;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                    <img src="{% static 'imagens/brasao3.png' %}" alt="Brasão" width="40" class="me-2">
+                    <span>Sistema Escolar</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">🏠 Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'cadastro' %}"><i class="fas fa-user-plus"></i> Cadastrar Aluno</a></li>
+                    </ul>
+                    <form class="d-flex" method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light">🚪 Logout</button>
+                    </form>
+                </div>
             </div>
         </nav>
     </header>
@@ -81,176 +96,117 @@
     <div class="container mt-5">
         <h2 class="text-center mb-5">📊 Dashboard de Alunos</h2>
 
+        <!-- Cards de estatísticas -->
         <div class="row text-center mb-5 gx-4">
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-blue shadow-sm">
                     <i class="fas fa-user-graduate stat-icon"></i>
-                    <h5>Total de Alunos</h5>
+                    <h5>Total</h5>
                     <h3 class="fw-bold">{{ total_alunos }}</h3>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-green shadow-sm">
                     <i class="fas fa-wheelchair stat-icon"></i>
-                    <h5>Alunos com Deficiência</h5>
+                    <h5>Deficiência</h5>
                     <h3 class="fw-bold">{{ alunos_com_deficiencia }}</h3>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-yellow shadow-sm">
                     <i class="fas fa-child stat-icon"></i>
-                    <h5>Até 7 anos</h5>
+                    <h5>Até 7</h5>
                     <h3 class="fw-bold">{{ alunos_ate_7 }}</h3>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-red shadow-sm">
                     <i class="fas fa-child stat-icon"></i>
-                    <h5>8 a 10 anos</h5>
+                    <h5>8 a 10</h5>
                     <h3 class="fw-bold">{{ alunos_8_a_10 }}</h3>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-orange shadow-sm">
                     <i class="fas fa-child stat-icon"></i>
-                    <h5>11 a 13 anos</h5>
+                    <h5>11 a 13</h5>
                     <h3 class="fw-bold">{{ alunos_11_a_13 }}</h3>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card bg-gradient-purple shadow-sm">
                     <i class="fas fa-child stat-icon"></i>
-                    <h5>14 ou mais</h5>
+                    <h5>14+</h5>
                     <h3 class="fw-bold">{{ alunos_14_acima }}</h3>
                 </div>
             </div>
         </div>
 
+        <!-- Gráficos -->
         <div class="row mb-5 gx-4 justify-content-center">
             <div class="col-md-6">
                 <div class="card shadow-sm p-4">
-                    <h4 class="card-title text-center mb-4">Gráfico de Alunos por Sexo</h4>
-                    <div class="chart-container">
-                        <canvas id="graficoSexo"></canvas>
-                    </div>
+                    <h4 class="text-center mb-4">Por Sexo</h4>
+                    <canvas id="graficoSexo"></canvas>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="card shadow-sm p-4">
-                    <h4 class="card-title text-center mb-4">Gráfico de Alunos com Deficiência</h4>
-                    <div class="chart-container">
-                        <canvas id="graficoDeficiencia"></canvas>
-                    </div>
+                    <h4 class="text-center mb-4">Com Deficiência</h4>
+                    <canvas id="graficoDeficiencia"></canvas>
                 </div>
             </div>
-            
+
             <div class="col-md-6 mt-4">
                 <div class="card shadow-sm p-4">
-                    <h4 class="card-title text-center mb-4">Gráfico de Alunos por Faixa Etária</h4>
-                    <div class="chart-container">
-                        <canvas id="graficoFaixaEtaria"></canvas>
-                    </div>
+                    <h4 class="text-center mb-4">Faixa Etária</h4>
+                    <canvas id="graficoFaixaEtaria"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Gráfico de Rosca (Sexo)
-        const ctxSexo = document.getElementById('graficoSexo');
-        const dataSexo = {
-            labels: ['Masculino', 'Feminino', 'Não Informado'],
-            datasets: [{
-                data: [{{ alunos_masculino }}, {{ alunos_feminino }}, {{ alunos_nao_informado }}],
-                backgroundColor: ['#5b86e5', '#ff99b3', '#808080'],
-            }]
-        };
-        new Chart(ctxSexo, {
+        new Chart(document.getElementById('graficoSexo'), {
             type: 'doughnut',
-            data: dataSexo,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed;
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
+            data: {
+                labels: ['Masculino', 'Feminino', 'Não informado'],
+                datasets: [{
+                    data: [{{ alunos_masculino }}, {{ alunos_feminino }}, {{ alunos_nao_informado }}],
+                    backgroundColor: ['#5b86e5', '#ff99b3', '#808080'],
+                }]
             }
         });
 
-        // Gráfico de Barras (Deficiência)
-        const ctxDeficiencia = document.getElementById('graficoDeficiencia');
-        const dataDeficiencia = {
-            labels: ['Com Deficiência', 'Sem Deficiência'],
-            datasets: [{
-                label: 'Número de Alunos',
-                data: [{{ alunos_com_deficiencia }}, {{ total_alunos }} - {{ alunos_com_deficiencia }}],
-                backgroundColor: ['#e53935', '#11998e'],
-                borderRadius: 10
-            }]
-        };
-        new Chart(ctxDeficiencia, {
+        new Chart(document.getElementById('graficoDeficiencia'), {
             type: 'bar',
-            data: dataDeficiencia,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
+            data: {
+                labels: ['Com', 'Sem'],
+                datasets: [{
+                    data: [{{ alunos_com_deficiencia }}, {{ total_alunos }} - {{ alunos_com_deficiencia }}],
+                    backgroundColor: ['#e53935', '#11998e'],
+                    borderRadius: 10
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
         });
-        
-        // NOVO GRÁFICO: Faixa Etária
-        const ctxFaixaEtaria = document.getElementById('graficoFaixaEtaria');
-        const dataFaixaEtaria = {
-            labels: ['Até 7 anos', '8 a 10 anos', '11 a 13 anos', '14+ anos'],
-            datasets: [{
-                label: 'Número de Alunos',
-                data: [{{ alunos_ate_7 }}, {{ alunos_8_a_10 }}, {{ alunos_11_a_13 }}, {{ alunos_14_acima }}],
-                backgroundColor: ['#5b86e5', '#11998e', '#f7971e', '#e53935'],
-                borderRadius: 10
-            }]
-        };
-        new Chart(ctxFaixaEtaria, {
+
+        new Chart(document.getElementById('graficoFaixaEtaria'), {
             type: 'bar',
-            data: dataFaixaEtaria,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
+            data: {
+                labels: ['Até 7', '8-10', '11-13', '14+'],
+                datasets: [{
+                    data: [{{ alunos_ate_7 }}, {{ alunos_8_a_10 }}, {{ alunos_11_a_13 }}, {{ alunos_14_acima }}],
+                    backgroundColor: ['#5b86e5', '#11998e', '#f7971e', '#e53935'],
+                    borderRadius: 10
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
         });
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

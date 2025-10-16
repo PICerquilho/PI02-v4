@@ -1,109 +1,145 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Sistema de Alunos</title>
+    <link rel="shortcut icon" href="{% static 'imagens/brasao.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
-        /* Estilos gerais */
+        /* ======== Reset e fontes ======== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
+        /* ======== Fundo com imagem ======== */
         body {
-            background-color: #f4f4f4;
+            background: url("{% static 'imagens/dashbackground.jpeg' %}") no-repeat center center fixed;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: white;
         }
 
-        /* Container do login */
+        /* ======== Camada de sobreposição azul clara (efeito lente) ======== */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 89, 179, 0.35); /* Azul translúcido */
+            backdrop-filter: blur(8px); /* Efeito de lente */
+            z-index: 0;
+        }
+
+        /* ======== Container principal ======== */
         .login-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1; /* Fica acima do overlay */
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             text-align: center;
             width: 100%;
-            max-width: 350px;
+            max-width: 380px;
+            backdrop-filter: blur(12px);
         }
 
-        h2 {
-            color: #0044cc;
+        .brasao-logo {
+            width: 110px;
+            height: auto;
             margin-bottom: 20px;
         }
 
-        /* Campos do formulário */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        h2 {
+            font-weight: 500;
+            margin-bottom: 25px;
         }
 
-        label {
-            font-weight: bold;
-            text-align: left;
-            display: block;
-            margin-bottom: 5px;
+        /* ======== Inputs ======== */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #ffffffb3;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px 15px 12px 45px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
             font-size: 16px;
+            transition: all 0.3s ease;
         }
 
-        /* Botões */
+        input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.35);
+        }
+
+        input::placeholder {
+            color: #e0e0e0;
+        }
+
+        /* ======== Botão ======== */
         button {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px;
+            background-color: #0059B3;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
             font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background-color: #003399;
+            background-color: #004499;
         }
 
-        .btn-voltar {
-            display: block;
-            margin-top: 10px;
-            background-color: #777;
-            padding: 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .btn-voltar:hover {
-            background-color: #555;
-        }
-
-        /* Mensagem de erro */
+        /* ======== Mensagem de erro ======== */
         .error-message {
-            color: red;
+            color: #ff6b6b;
             font-size: 14px;
             margin-bottom: 10px;
+        }
+
+        /* ======== Responsividade ======== */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                max-width: 90%;
+            }
         }
     </style>
 </head>
 <body>
 
+    <div class="overlay"></div>
+
     <div class="login-container">
+        <img src="{% static 'imagens/brasao3.png' %}" alt="Brasão" class="brasao-logo">
         <h2>Login</h2>
 
         {% if messages %}
@@ -114,12 +150,14 @@
 
         <form method="POST">
             {% csrf_token %}
-            <label for="username">Usuário:</label>
-            <input type="text" name="username" required>
-            
-            <label for="password">Senha:</label>
-            <input type="password" name="password" required>
-            
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" placeholder="Usuário" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" placeholder="Senha" required>
+            </div>
             <button type="submit">Entrar</button>
         </form>
     </div>
