@@ -30,3 +30,16 @@ class AlunoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if not self.instance or not self.instance.pk:
             self.fields['foto'].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nome = cleaned_data.get('nome')
+        nome_social = cleaned_data.get('nome_social')
+
+        if nome and not nome_social:
+            cleaned_data['nome_social'] = nome
+
+        if cleaned_data.get('deficiencia') == 'S' and not cleaned_data.get('deficiencia_qual'):
+            cleaned_data['deficiencia_qual'] = 'Não Informado'
+
+        return cleaned_data

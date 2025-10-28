@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AlunoForm
 from .models import Aluno
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -143,6 +143,23 @@ def dashboard(request):
             elif idade >= 14:
                 alunos_14_acima += 1
     
+    # NOVAS ESTATÍSTICAS: ALUNOS POR SÉRIE
+    alunos_por_serie = Aluno.objects.values('serie').annotate(total=Count('serie')).order_by('serie')
+    series_labels = [item['serie'] for item in alunos_por_serie]
+    series_data = [item['total'] for item in alunos_por_serie]
+
+    # NOVAS ESTATÍSTICAS: ALUNOS POR TURNO
+    alunos_por_turno = Aluno.objects.values('periodo').annotate(total=Count('periodo')).order_by('periodo')
+    turnos_labels = [item['periodo'] for item in alunos_por_turno]
+    turnos_data = [item['total'] for item in alunos_por_turno]
+    
+    # NOVAS ESTATÍSTICAS: Detalhes dos tipos de deficiência para o tooltip
+    tipos_deficiencia_qs = Aluno.objects.filter(deficiencia='S').exclude(deficiencia_qual__isnull=True).exclude(deficiencia_qual__exact='').values('deficiencia_qual').annotate(total=Count('id')).order_by('-total')
+    tooltip_deficiencia_detalhes = [f"{item['deficiencia_qual']}: {item['total']}" for item in tipos_deficiencia_qs]
+
+    # Total de alunos sem deficiência para o gráfico
+    alunos_sem_deficiencia = total_alunos - alunos_com_deficiencia
+
     # O dashboard agora terá um novo contexto
     context = {
         'total_alunos': total_alunos,
@@ -150,9 +167,15 @@ def dashboard(request):
         'alunos_feminino': alunos_feminino,
         'alunos_nao_informado': alunos_nao_informado,
         'alunos_com_deficiencia': alunos_com_deficiencia,
+        'alunos_sem_deficiencia': alunos_sem_deficiencia,
         'alunos_ate_7': alunos_ate_7,
         'alunos_8_a_10': alunos_8_a_10,
         'alunos_11_a_13': alunos_11_a_13,
         'alunos_14_acima': alunos_14_acima,
+        'series_labels': series_labels,
+        'series_data': series_data,
+        'turnos_labels': turnos_labels,
+        'turnos_data': turnos_data,
+        'tooltip_deficiencia_detalhes': tooltip_deficiencia_detalhes,
     }
     return render(request, 'dashboard.html', context)

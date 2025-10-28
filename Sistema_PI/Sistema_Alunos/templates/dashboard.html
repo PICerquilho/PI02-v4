@@ -144,24 +144,39 @@
 
         <!-- Gráficos -->
         <div class="row mb-5 gx-4 justify-content-center">
-            <div class="col-md-6">
+            <!-- Linha 1: Sexo e Deficiência -->
+            <div class="col-lg-6 mb-4">
                 <div class="card shadow-sm p-4">
                     <h4 class="text-center mb-4">Por Sexo</h4>
                     <canvas id="graficoSexo"></canvas>
                 </div>
             </div>
-
-            <div class="col-md-6">
+            <div class="col-lg-6 mb-4">
                 <div class="card shadow-sm p-4">
-                    <h4 class="text-center mb-4">Com Deficiência</h4>
+                    <h4 class="text-center mb-4">Alunos com Deficiência</h4>
                     <canvas id="graficoDeficiencia"></canvas>
                 </div>
             </div>
 
-            <div class="col-md-6 mt-4">
+            <!-- Linha 2: Faixa Etária (Ocupando a linha toda) -->
+            <div class="col-lg-12 mb-4">
                 <div class="card shadow-sm p-4">
                     <h4 class="text-center mb-4">Faixa Etária</h4>
                     <canvas id="graficoFaixaEtaria"></canvas>
+                </div>
+            </div>
+
+            <!-- Linha 3: Série e Turno -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm p-4">
+                    <h4 class="text-center mb-4">Alunos por Série</h4>
+                    <canvas id="graficoSerie"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm p-4">
+                    <h4 class="text-center mb-4">Alunos por Turno</h4>
+                    <canvas id="graficoTurno"></canvas>
                 </div>
             </div>
         </div>
@@ -169,41 +184,115 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        new Chart(document.getElementById('graficoSexo'), {
+        new Chart(document.getElementById('graficoSexo').getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['Masculino', 'Feminino', 'Não informado'],
+                labels: ['Masculino', 'Feminino'],
                 datasets: [{
                     data: [{{ alunos_masculino }}, {{ alunos_feminino }}, {{ alunos_nao_informado }}],
                     backgroundColor: ['#5b86e5', '#ff99b3', '#808080'],
                 }]
+            },
+            options: {
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        reverse: false /* Garante que a ordem da legenda não seja invertida */
+                    }
+                },
             }
         });
 
-        new Chart(document.getElementById('graficoDeficiencia'), {
-            type: 'bar',
+        new Chart(document.getElementById('graficoDeficiencia').getContext('2d'), {
+            type: 'doughnut',
             data: {
-                labels: ['Com', 'Sem'],
+                labels: ['Com Deficiência', 'Sem Deficiência'],
                 datasets: [{
-                    data: [{{ alunos_com_deficiencia }}, {{ total_alunos }} - {{ alunos_com_deficiencia }}],
+                    data: [{{ alunos_com_deficiencia }}, {{ alunos_sem_deficiencia }}],
                     backgroundColor: ['#e53935', '#11998e'],
-                    borderRadius: 10
                 }]
             },
-            options: { scales: { y: { beginAtZero: true } } }
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        reverse: false /* Garante que a ordem da legenda não seja invertida */
+                    },
+                    tooltip: {
+                        callbacks: {
+                            footer: function(tooltipItems) {
+                                if (tooltipItems[0].label === 'Com Deficiência') {
+                                    return {{ tooltip_deficiencia_detalhes|safe }};
+                                }
+                            }
+                        }
+                    }
+                },
+            }
         });
 
-        new Chart(document.getElementById('graficoFaixaEtaria'), {
+        new Chart(document.getElementById('graficoFaixaEtaria').getContext('2d'), {
             type: 'bar',
             data: {
                 labels: ['Até 7', '8-10', '11-13', '14+'],
                 datasets: [{
+                    label: 'Quantidade',
                     data: [{{ alunos_ate_7 }}, {{ alunos_8_a_10 }}, {{ alunos_11_a_13 }}, {{ alunos_14_acima }}],
                     backgroundColor: ['#5b86e5', '#11998e', '#f7971e', '#e53935'],
                     borderRadius: 10
                 }]
             },
-            options: { scales: { y: { beginAtZero: true } } }
+            options: {
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // NOVO GRÁFICO: ALUNOS POR SÉRIE
+        new Chart(document.getElementById('graficoSerie').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: {{ series_labels|safe }},
+                datasets: [{
+                    label: 'Alunos',
+                    data: {{ series_data|safe }},
+                    backgroundColor: ['#36a2eb', '#ff6384', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40', '#c9cbcf', '#e7e9ed', '#77dd77'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        reverse: false /* Garante que a ordem da legenda não seja invertida */
+                    }
+                }
+            }
+        });
+
+        // NOVO GRÁFICO: ALUNOS POR TURNO
+        new Chart(document.getElementById('graficoTurno').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ turnos_labels|safe }},
+                datasets: [{
+                    label: 'Alunos',
+                    data: {{ turnos_data|safe }},
+                    backgroundColor: ['#FFD700', '#87CEEB', '#32CD32'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        reverse: false /* Garante que a ordem da legenda não seja invertida */
+                    }
+                }
+            }
         });
     </script>
 
