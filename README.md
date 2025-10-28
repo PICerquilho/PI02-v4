@@ -1,4 +1,3 @@
-Com certeza! Entendido o padrão. Aqui está o README ajustado conforme suas especificações, mantendo as informações do seu projeto:
 
 ---
 
